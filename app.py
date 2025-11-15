@@ -1,8 +1,9 @@
 import tkinter as tk 
-from tkinter import ttk, messagebox
+from tkinter import ttk, filedialog, messagebox
 import math
-from bfs import bfs
 import time
+import json
+from bfs import bfs
 
 
 class App(tk.Tk):
@@ -50,7 +51,18 @@ class App(tk.Tk):
 
         self.start_button = ttk.Button(self, text="Start BFS", style="Custom.TButton", command=self.start_bfs)
         self.reset_button = ttk.Button(self, text="Reset graph", style="Custom.TButton", comma=self.draw_graph)
-        self.load_button = ttk.Button(self, text="Load graph", style="Custom.TButton")
+        self.load_button = ttk.Button(self, text="Load graph", style="Custom.TButton", command=self.load_graph)
+
+    def load_graph(self):
+        file_path = filedialog.askopenfilename()
+
+        with open(file_path) as file:
+            # try:
+            self.graph = dict(json.load(file))
+            self.canvas.delete("all")
+            self.draw_graph()
+            # except:
+            #     messagebox.showerror("Error", "Something wrong with file!!!")
 
     def setup_layout(self):
         self.canvas.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
