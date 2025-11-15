@@ -1,15 +1,9 @@
 import tkinter as tk 
 from tkinter import ttk
 import math
+from bfs import bfs
+import time
 
-graph = {
-    'A': ['B', 'C'],
-    'B': ['A', 'D', 'E'],
-    'C': ['A', 'F'],
-    'D': ['B'],
-    'E': ['B', 'F'],
-    'F': ['C', 'E']
-}
 
 class App(tk.Tk):
     def __init__(self):
@@ -18,38 +12,60 @@ class App(tk.Tk):
         self.title("bfs-algorithm")
         self.geometry("900x600")
 
+        self.graph = {
+            'A': ['B', 'C'],
+            'B': ['A', 'D', 'E'],
+            'C': ['A', 'F'],
+            'D': ['B'],
+            'E': ['B', 'F'],
+            'F': ['C', 'E'],
+            'G': []
+        }
+
         self.create_widgets()
         self.setup_layout()
-        self.draw_graph(graph)
-
-        self.mainloop()
+        self.draw_graph()
 
     def create_widgets(self):
         self.canvas = tk.Canvas(self, bg='white', relief=tk.SUNKEN, borderwidth=2)
 
+        self.start_button = ttk.Button(self, text="Start BFS", command=self.start_bfs)
+        self.reset_button = ttk.Button(self, text="Reset graph", comma=self.draw_graph)
+
     def setup_layout(self):
         self.canvas.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-    def draw_graph(self, graph):
-        vertexes = set(graph.keys())
-        edges = set((n, v) for n in graph for v in graph[n])
+        self.start_button.pack(side=tk.LEFT, padx=10, pady=5, ipadx=10, ipady=10) 
+        self.reset_button.pack(side=tk.LEFT, padx=10, pady=5, ipadx=10, ipady=10) 
 
-        coords = {}
+    def draw_graph(self):
+        vertexes = set(self.graph.keys())
+        edges = set((n, v) for n in self.graph for v in self.graph[n])
+
+        self.coords = {}
         for i, vertex in enumerate(vertexes):
             angle = 2 * math.pi * (i / len(vertexes))
 
-            coords[vertex] = (
-                300 + 150 * math.cos(angle), 
-                300 + 150 * math.sin(angle)
+            self.coords[vertex] = (
+                450 + 200 * math.cos(angle), 
+                275 + 200 * math.sin(angle)
             )
 
         for v1, v2 in edges:
-            self.canvas.create_line(*coords[v1], *coords[v2], width=3, fill='black')
+            self.canvas.create_line(*self.coords[v1], *self.coords[v2], width=3, fill='black')
 
-        for vertex, (x, y) in coords.items():
+        for vertex, (x, y) in self.coords.items():
             self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, fill='lightgreen', outline='black', width=3)
             self.canvas.create_text(x, y, text=str(vertex), font=('Arial', 12))
-            
+
+    def start_bfs(self):
+        lst = bfs(self.graph, "F")
+        for vertex in lst:
+            x, y = self.coords[vertex]
+            self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, fill='lightblue', outline='black', width=3)
+            self.canvas.create_text(x, y, text=str(vertex), font=('Arial', 12))
+            time.sleep(1)
+            self.update()
 
 
 app = App()
