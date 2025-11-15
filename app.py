@@ -1,5 +1,5 @@
 import tkinter as tk 
-from tkinter import ttk
+from tkinter import ttk, messagebox
 import math
 from bfs import bfs
 import time
@@ -22,21 +22,45 @@ class App(tk.Tk):
             'G': []
         }
 
+        self.create_styles()
         self.create_widgets()
         self.setup_layout()
         self.draw_graph()
 
+    def create_styles(self):
+        self.style = ttk.Style()
+
+        self.style.configure(
+            "Custom.TLabel",
+            font=("Arial", 14),
+            padding=5
+        )
+
+        self.style.configure(
+            "Custom.TButton",
+            font=("Arial", 12),
+            padding=5
+        )
+
     def create_widgets(self):
         self.canvas = tk.Canvas(self, bg='white', relief=tk.SUNKEN, borderwidth=2)
 
-        self.start_button = ttk.Button(self, text="Start BFS", command=self.start_bfs)
-        self.reset_button = ttk.Button(self, text="Reset graph", comma=self.draw_graph)
+        self.label = ttk.Label(self, text="Enter start vertex:", style="Custom.TLabel")
+        self.entry = ttk.Entry(self, font=("Arial", 18, "bold"), width=3, justify='center')
+
+        self.start_button = ttk.Button(self, text="Start BFS", style="Custom.TButton", command=self.start_bfs)
+        self.reset_button = ttk.Button(self, text="Reset graph", style="Custom.TButton", comma=self.draw_graph)
+        self.load_button = ttk.Button(self, text="Load graph", style="Custom.TButton")
 
     def setup_layout(self):
         self.canvas.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        self.start_button.pack(side=tk.LEFT, padx=10, pady=5, ipadx=10, ipady=10) 
-        self.reset_button.pack(side=tk.LEFT, padx=10, pady=5, ipadx=10, ipady=10) 
+        self.label.pack(side=tk.LEFT, padx=(10, 0), pady=5)
+        self.entry.pack(side=tk.LEFT, padx=10, pady=5)
+
+        self.start_button.pack(side=tk.LEFT, padx=(200, 10), pady=5) 
+        self.reset_button.pack(side=tk.LEFT, padx=10, pady=5)
+        self.load_button.pack(side=tk.LEFT, padx=10, pady=5)
 
     def draw_graph(self):
         vertexes = set(self.graph.keys())
@@ -59,13 +83,16 @@ class App(tk.Tk):
             self.canvas.create_text(x, y, text=str(vertex), font=('Arial', 12))
 
     def start_bfs(self):
-        lst = bfs(self.graph, "F")
-        for vertex in lst:
-            x, y = self.coords[vertex]
-            self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, fill='lightblue', outline='black', width=3)
-            self.canvas.create_text(x, y, text=str(vertex), font=('Arial', 12))
-            time.sleep(1)
-            self.update()
+        try:
+            lst = bfs(self.graph, self.entry.get())
+            for vertex in lst:
+                x, y = self.coords[vertex]
+                self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, fill='lightblue', outline='black', width=3)
+                self.canvas.create_text(x, y, text=str(vertex), font=('Arial', 12))
+                time.sleep(1)
+                self.update()
+        except KeyError:
+            messagebox.showerror("Error", "There is no such vertex!!!")
 
 
 app = App()
