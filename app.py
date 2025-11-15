@@ -57,12 +57,12 @@ class App(tk.Tk):
         file_path = filedialog.askopenfilename()
 
         with open(file_path) as file:
-            # try:
-            self.graph = dict(json.load(file))
-            self.canvas.delete("all")
-            self.draw_graph()
-            # except:
-            #     messagebox.showerror("Error", "Something wrong with file!!!")
+            try:
+                self.graph = dict(json.load(file))
+                self.canvas.delete("all")
+                self.draw_graph()
+            except:
+                messagebox.showerror("Error", "Something wrong with file!!!")
 
     def setup_layout(self):
         self.canvas.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
@@ -95,6 +95,7 @@ class App(tk.Tk):
             self.canvas.create_text(x, y, text=str(vertex), font=('Arial', 12))
 
     def start_bfs(self):
+        self.draw_graph()
         try:
             lst = bfs(self.graph, self.entry.get())
             for vertex in lst:
