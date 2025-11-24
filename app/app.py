@@ -44,13 +44,13 @@ class App(tk.Tk):
         )
 
     def create_widgets(self):
-        self.canvas = tk.Canvas(self, bg='white', relief=tk.SUNKEN, borderwidth=2)
+        self.canvas = tk.Canvas(self, bg="white", relief=tk.SUNKEN, borderwidth=2)
 
         self.start_label = ttk.Label(self, text="Start vertex:", style="Custom.TLabel")
-        self.start_entry = ttk.Entry(self, font=("Arial", 18, "bold"), width=3, justify='center')
+        self.start_entry = ttk.Entry(self, font=("Arial", 18, "bold"), width=3, justify="center")
 
         self.end_label = ttk.Label(self, text="End vertex:", style="Custom.TLabel")
-        self.end_entry = ttk.Entry(self, font=("Arial", 18, "bold"), width=3, justify='center')
+        self.end_entry = ttk.Entry(self, font=("Arial", 18, "bold"), width=3, justify="center")
 
         self.start_button = ttk.Button(self, text="Start BFS", style="Custom.TButton", command=self.start_bfs)
         self.reset_button = ttk.Button(self, text="Reset graph", style="Custom.TButton", comma=self.draw_graph)
@@ -96,7 +96,7 @@ class App(tk.Tk):
         for v1, v2 in edges:
             x1, y1, x2, y2 = *self.coords[v1], *self.coords[v2]
 
-            self.canvas.create_line(x1, y1, x2, y2, width=3, fill='black')
+            self.canvas.create_line(x1, y1, x2, y2, width=3, fill="black")
 
             angle = math.atan2(y2 - y1, x2 - x1)
 
@@ -108,12 +108,12 @@ class App(tk.Tk):
             arrow_x2 = end_x - 20 * math.cos(angle + math.pi / 12)  
             arrow_y2 = end_y - 20 * math.sin(angle + math.pi / 12)
 
-            self.canvas.create_line(arrow_x1, arrow_y1, end_x, end_y, width=3, fill='black')
-            self.canvas.create_line(arrow_x2, arrow_y2, end_x, end_y, width=3, fill='black')            
+            self.canvas.create_line(arrow_x1, arrow_y1, end_x, end_y, width=3, fill="black")
+            self.canvas.create_line(arrow_x2, arrow_y2, end_x, end_y, width=3, fill="black")            
 
         for vertex, (x, y) in self.coords.items():
-            self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, fill='lightgreen', outline='black', width=3)
-            self.canvas.create_text(x, y, text=str(vertex), font=('Arial', 12))
+            self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, fill="lightgreen", outline="black", width=3)
+            self.canvas.create_text(x, y, text=str(vertex), font=("Arial", 12))
 
     def start_bfs(self):
         self.draw_graph()
@@ -121,14 +121,15 @@ class App(tk.Tk):
             lst = bfs(self.graph, self.start_entry.get(), self.end_entry.get())
             for vertex in lst:
                 x, y = self.coords[vertex]
-                self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, fill='lightblue', outline='black', width=3)
-                self.canvas.create_text(x - 7, y, text=str(vertex), font=('Arial', 12))
-                self.canvas.create_text(x + 7, y, text=lst.index(vertex), font=('Arial', 12))
+                self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, fill="lightblue", outline="black", width=3)
+                self.canvas.create_text(x - 7, y, text=str(vertex), font=("Arial", 12))
+                self.canvas.create_text(x + 7, y, text=lst.index(vertex), font=("Arial", 12))
                 time.sleep(1)
                 self.update()
         except KeyError:
             messagebox.showerror("Error", "There is no such vertex!!!")
 
 
-app = App()
-app.mainloop()
+if __name__ == "__main__":
+    app = App()
+    app.mainloop()
