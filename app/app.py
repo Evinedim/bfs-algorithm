@@ -46,8 +46,11 @@ class App(tk.Tk):
     def create_widgets(self):
         self.canvas = tk.Canvas(self, bg='white', relief=tk.SUNKEN, borderwidth=2)
 
-        self.label = ttk.Label(self, text="Enter start vertex:", style="Custom.TLabel")
-        self.entry = ttk.Entry(self, font=("Arial", 18, "bold"), width=3, justify='center')
+        self.start_label = ttk.Label(self, text="Start vertex:", style="Custom.TLabel")
+        self.start_entry = ttk.Entry(self, font=("Arial", 18, "bold"), width=3, justify='center')
+
+        self.end_label = ttk.Label(self, text="End vertex:", style="Custom.TLabel")
+        self.end_entry = ttk.Entry(self, font=("Arial", 18, "bold"), width=3, justify='center')
 
         self.start_button = ttk.Button(self, text="Start BFS", style="Custom.TButton", command=self.start_bfs)
         self.reset_button = ttk.Button(self, text="Reset graph", style="Custom.TButton", comma=self.draw_graph)
@@ -67,10 +70,13 @@ class App(tk.Tk):
     def setup_layout(self):
         self.canvas.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        self.label.pack(side=tk.LEFT, padx=(10, 0), pady=5)
-        self.entry.pack(side=tk.LEFT, padx=10, pady=5)
+        self.start_label.pack(side=tk.LEFT, padx=(10, 0), pady=5)
+        self.start_entry.pack(side=tk.LEFT, padx=10, pady=5)
 
-        self.start_button.pack(side=tk.LEFT, padx=(200, 10), pady=5) 
+        self.end_label.pack(side=tk.LEFT, padx=(10, 0), pady=5)
+        self.end_entry.pack(side=tk.LEFT, padx=10, pady=5)
+
+        self.start_button.pack(side=tk.LEFT, padx=(75, 10), pady=5) 
         self.reset_button.pack(side=tk.LEFT, padx=10, pady=5)
         self.load_button.pack(side=tk.LEFT, padx=10, pady=5)
 
@@ -112,7 +118,7 @@ class App(tk.Tk):
     def start_bfs(self):
         self.draw_graph()
         try:
-            lst = bfs(self.graph, self.entry.get())
+            lst = bfs(self.graph, self.start_entry.get(), self.end_entry.get())
             for vertex in lst:
                 x, y = self.coords[vertex]
                 self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, fill='lightblue', outline='black', width=3)
