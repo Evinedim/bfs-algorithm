@@ -88,7 +88,22 @@ class App(tk.Tk):
             )
 
         for v1, v2 in edges:
-            self.canvas.create_line(*self.coords[v1], *self.coords[v2], width=3, fill='black')
+            x1, y1, x2, y2 = *self.coords[v1], *self.coords[v2]
+
+            self.canvas.create_line(x1, y1, x2, y2, width=3, fill='black')
+
+            angle = math.atan2(y2 - y1, x2 - x1)
+
+            end_x = x2 - 20 * math.cos(angle)
+            end_y = y2 - 20 * math.sin(angle)
+ 
+            arrow_x1 = end_x - 20 * math.cos(angle - math.pi / 12)
+            arrow_y1 = end_y - 20 * math.sin(angle - math.pi / 12)
+            arrow_x2 = end_x - 20 * math.cos(angle + math.pi / 12)  
+            arrow_y2 = end_y - 20 * math.sin(angle + math.pi / 12)
+
+            self.canvas.create_line(arrow_x1, arrow_y1, end_x, end_y, width=3, fill='black')
+            self.canvas.create_line(arrow_x2, arrow_y2, end_x, end_y, width=3, fill='black')            
 
         for vertex, (x, y) in self.coords.items():
             self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, fill='lightgreen', outline='black', width=3)
@@ -101,7 +116,8 @@ class App(tk.Tk):
             for vertex in lst:
                 x, y = self.coords[vertex]
                 self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, fill='lightblue', outline='black', width=3)
-                self.canvas.create_text(x, y, text=str(vertex), font=('Arial', 12))
+                self.canvas.create_text(x - 7, y, text=str(vertex), font=('Arial', 12))
+                self.canvas.create_text(x + 7, y, text=lst.index(vertex), font=('Arial', 12))
                 time.sleep(1)
                 self.update()
         except KeyError:
