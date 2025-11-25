@@ -118,12 +118,20 @@ class App(tk.Tk):
     def start_bfs(self):
         self.draw_graph()
         try:
+            end_x, end_y = self.coords[self.end_entry.get()]
+
             lst = bfs(self.graph, self.start_entry.get(), self.end_entry.get())
+
             for vertex in lst:
                 x, y = self.coords[vertex]
                 self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, fill="lightblue", outline="black", width=3)
+
+                if (x, y) == (end_x, end_y):
+                    self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, fill="red", outline="black", width=3)
+
                 self.canvas.create_text(x - 7, y, text=str(vertex), font=("Arial", 12))
                 self.canvas.create_text(x + 7, y, text=lst.index(vertex), font=("Arial", 12))
+
                 time.sleep(1)
                 self.update()
         except KeyError:
