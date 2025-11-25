@@ -56,17 +56,6 @@ class App(tk.Tk):
         self.reset_button = ttk.Button(self, text="Reset graph", style="Custom.TButton", comma=self.draw_graph)
         self.load_button = ttk.Button(self, text="Load graph", style="Custom.TButton", command=self.load_graph)
 
-    def load_graph(self):
-        file_path = filedialog.askopenfilename()
-
-        with open(file_path) as file:
-            try:
-                self.graph = dict(json.load(file))
-                self.canvas.delete("all")
-                self.draw_graph()
-            except:
-                messagebox.showerror("Error", "Something wrong with file!!!")
-
     def setup_layout(self):
         self.canvas.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
@@ -115,6 +104,17 @@ class App(tk.Tk):
             self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, fill="lightgreen", outline="black", width=3)
             self.canvas.create_text(x, y, text=str(vertex), font=("Arial", 12))
 
+    def load_graph(self):
+        file_path = filedialog.askopenfilename()
+
+        with open(file_path) as file:
+            try:
+                self.graph = dict(json.load(file))
+                self.canvas.delete("all")
+                self.draw_graph()
+            except:
+                messagebox.showerror("Error", "Something wrong with file!!!")
+                
     def start_bfs(self):
         self.draw_graph()
         try:
