@@ -1,7 +1,6 @@
 import tkinter as tk 
 from tkinter import ttk, filedialog, messagebox
 import math
-import time
 import json
 from bfs import bfs
 
@@ -11,7 +10,7 @@ class App(tk.Tk):
         super().__init__()
 
         self.title("bfs-algorithm")
-        self.geometry("900x600")
+        self.geometry("1200x700")
 
         self.graph = {
             'A': ['B', 'C'],
@@ -22,6 +21,9 @@ class App(tk.Tk):
             'F': ['C', 'E'],
             'G': []
         }
+
+        self.bfs_steps = []
+        self.current_step = 0
 
         self.create_styles()
         self.create_widgets()
@@ -52,9 +54,12 @@ class App(tk.Tk):
         self.end_label = ttk.Label(self, text="End vertex:", style="Custom.TLabel")
         self.end_entry = ttk.Entry(self, font=("Arial", 18, "bold"), width=3, justify="center")
 
-        self.start_button = ttk.Button(self, text="Start BFS", style="Custom.TButton", command=self.start_bfs)
+        self.initialize_button = ttk.Button(self, text="Initialize BFS", style="Custom.TButton", command=self.initialize_bfs)
         self.reset_button = ttk.Button(self, text="Reset graph", style="Custom.TButton", comma=self.draw_graph)
         self.load_button = ttk.Button(self, text="Load graph", style="Custom.TButton", command=self.load_graph)
+
+        self.next_step_button = ttk.Button(self, text="Next step", style="Custom.TButton", command=self.next_step)
+        self.previous_step_button = ttk.Button(self, text="Previous step", style="Custom.TButton", command=self.previous_step)
 
     def setup_layout(self):
         self.canvas.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
@@ -65,9 +70,12 @@ class App(tk.Tk):
         self.end_label.pack(side=tk.LEFT, padx=(10, 0), pady=5)
         self.end_entry.pack(side=tk.LEFT, padx=10, pady=5)
 
-        self.start_button.pack(side=tk.LEFT, padx=(75, 10), pady=5) 
+        self.initialize_button.pack(side=tk.LEFT, padx=(75, 10), pady=5)
+        self.next_step_button.pack(side=tk.LEFT, padx=10, pady=5)
+        self.previous_step_button.pack(side=tk.LEFT, padx=10, pady=5)
         self.reset_button.pack(side=tk.LEFT, padx=10, pady=5)
         self.load_button.pack(side=tk.LEFT, padx=10, pady=5)
+
 
     def draw_graph(self):
         vertexes = set(self.graph.keys())
@@ -114,15 +122,22 @@ class App(tk.Tk):
                 self.draw_graph()
             except:
                 messagebox.showerror("Error", "Something wrong with file!!!")
-                
-    def start_bfs(self):
-        self.draw_graph()
+    
+    def initialize_bfs(self):
         try:
+            self.coords[self.end_entry.get()]
+            self.current_step = 0
+            self.bfs_steps = bfs(self.graph, self.start_entry.get(), self.end_entry.get())
+        except:
+            messagebox.showerror("Error", "There are no such vertexes!!!")
+
+    def draw_current(self, nodes):
+        try:
+            self.draw_graph()
+
             end_x, end_y = self.coords[self.end_entry.get()]
 
-            lst = bfs(self.graph, self.start_entry.get(), self.end_entry.get())
-
-            for vertex in lst:
+            for vertex in nodes:
                 x, y = self.coords[vertex]
                 self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, fill="lightblue", outline="black", width=3)
 
@@ -130,13 +145,22 @@ class App(tk.Tk):
                     self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, fill="red", outline="black", width=3)
 
                 self.canvas.create_text(x - 7, y, text=str(vertex), font=("Arial", 12))
-                self.canvas.create_text(x + 7, y, text=lst.index(vertex), font=("Arial", 12))
+                self.canvas.create_text(x + 7, y, text=nodes.index(vertex), font=("Arial", 12))
 
-                time.sleep(1)
                 self.update()
         except KeyError:
-            messagebox.showerror("Error", "There is no such vertex!!!")
+            messagebox.showerror("Error", "Graph is not initialized!!!")
 
+    def next_step(self):
+        if self.current_step < len(self.bfs_steps) - 1:
+            self.current_step += 1
+            self.draw_current(self.bfs_steps[self.current_step])
+
+
+    def previous_step(self):
+        if self.current_step > 0:
+            self.current_step -= 1
+            self.draw_current(self.bfs_steps[self.current_step])
 
 if __name__ == "__main__":
     app = App()
