@@ -134,20 +134,14 @@ class App(tk.Tk):
         for v1, v2 in edges:
             x1, y1, x2, y2 = *self.coords[v1], *self.coords[v2]
 
-            self.canvas.create_line(x1, y1, x2, y2, width=3, fill="black")
-
             angle = math.atan2(y2 - y1, x2 - x1)
 
-            end_x = x2 - 20 * math.cos(angle)
-            end_y = y2 - 20 * math.sin(angle)
- 
-            arrow_x1 = end_x - 20 * math.cos(angle - math.pi / 12)
-            arrow_y1 = end_y - 20 * math.sin(angle - math.pi / 12)
-            arrow_x2 = end_x - 20 * math.cos(angle + math.pi / 12)  
-            arrow_y2 = end_y - 20 * math.sin(angle + math.pi / 12)
+            x1 -= 20 * math.cos(angle)
+            y1 -= 20 * math.sin(angle)
+            x2 -= 20 * math.cos(angle)
+            y2 -= 20 * math.sin(angle)
 
-            self.canvas.create_line(arrow_x1, arrow_y1, end_x, end_y, width=3, fill="black")
-            self.canvas.create_line(arrow_x2, arrow_y2, end_x, end_y, width=3, fill="black")            
+            self.canvas.create_line(x1, y1, x2, y2, width=3, fill="black", arrow=tk.LAST, arrowshape=(16, 20, 6))          
 
         for vertex, (x, y) in self.coords.items():
             self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, fill="lightgreen", outline="black", width=3)
@@ -166,42 +160,70 @@ class App(tk.Tk):
     
     def initialize_bfs(self):
         try:
-            self.coords[self.end_entry.get()]
-            self.current_step = 0
-            self.bfs_steps = bfs(self.graph, self.start_entry.get(), self.end_entry.get())
+            self.current_step = 0          
+            self.bfs_steps = bfs(self.graph, self.start_entry.get().strip(), self.end_entry.get().strip())
+            
+            self.step_label.config(text=f"Step: 1/{len(self.bfs_steps)}")
+            
+            final_path = self.bfs_steps[-1]['current_path']
+            if final_path[-1] == self.end_entry.get().strip():
+                steps_count = len(final_path) - 1
+                self.status_label.config(
+                    text=f"Success: path found!\n"
+                         f"Shortest path: {' → '.join(final_path)}\n"
+                         f"Steps count: {steps_count}"
+                )
+            else:
+                self.status_label.config(
+                    text=f"Fail: no path found!\n"
+                         f"Explored all reachable vertices\n"
+                         f"Steps taken: {len(self.bfs_steps)}"
+                )
+            self.draw_current()
         except:
             messagebox.showerror("Error", "There are no such vertexes!!!")
 
-    def draw_current(self, nodes):
-        try:
-            self.draw_graph()
-
-            end_x, end_y = self.coords[self.end_entry.get()]
-
-            for vertex in nodes:
-                x, y = self.coords[vertex]
-                self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, fill="lightblue", outline="black", width=3)
-
-                if (x, y) == (end_x, end_y):
-                    self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, fill="red", outline="black", width=3)
-
-                self.canvas.create_text(x - 7, y, text=str(vertex), font=("Arial", 12))
-                self.canvas.create_text(x + 7, y, text=nodes.index(vertex), font=("Arial", 12))
-
-                self.update()
-        except KeyError:
-            messagebox.showerror("Error", "Graph is not initialized!!!")
+    def draw_current(self):
+        if not self.bfs_steps or self.current_step >= len(self.bfs_steps):
+            return
+        
+        self.canvas.delete("all")
+        self.draw_graph()
+        
+        step = self.bfs_steps[self.current_step]
+        current_path = step['current_path']
+        visited = step['visited']
+        current_node = step['current_node']
+        
+        self.step_label.config(text=f"Step: {self.current_step + 1}/{len(self.bfs_steps)}")
+        self.path_label.config(text=f"Current path: \n{' → '.join(current_path)}")
+        self.visited_label.config(text=f"Visited vertices: \n{', '.join(sorted(visited)) if visited else "-"}")
+        
+        queue_display = [' → '.join(path) for path in step['queue']]
+        self.queue_label.config(text=f"Queue content: \n{'\n'.join(queue_display) if queue_display else "-"}")
+        
+        for vertex, (x, y) in self.coords.items():
+            if current_node == vertex == self.end_entry.get().strip():
+                fill_color = "red"
+            elif vertex == current_node:
+                fill_color = "orange"
+            elif vertex in visited:
+                fill_color = "lightblue"
+            else:
+                fill_color = "lightgreen"
+            
+            self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, fill=fill_color, outline="black", width=2)
+            self.canvas.create_text(x, y, text=str(vertex), font=("Arial", 12, "bold"))
 
     def next_step(self):
         if self.current_step < len(self.bfs_steps) - 1:
             self.current_step += 1
-            self.draw_current(self.bfs_steps[self.current_step])
-
+            self.draw_current()
 
     def previous_step(self):
         if self.current_step > 0:
             self.current_step -= 1
-            self.draw_current(self.bfs_steps[self.current_step])
+            self.draw_current()
 
 if __name__ == "__main__":
     app = App()
