@@ -59,7 +59,7 @@ class App(tk.Tk):
         self.step_label = tk.Label(self.step_info_frame, text="Step: 0/0", font=("Arial", 12, "bold"))
         
         self.graph_frame = tk.LabelFrame(self.left_frame, text="Graph Operations", font=("Arial", 12), padx=10, pady=10)
-        self.reset_button = tk.Button(self.graph_frame, text="🔄 Reset BFS", font=("Arial", 12), bg="#FF9800", 
+        self.reset_button = tk.Button(self.graph_frame, text="🔄 Reset Graph", font=("Arial", 12), bg="#FF9800", 
                                       fg="#FFFFFF", relief=tk.RAISED, borderwidth=2, width=15, command=self.reset_bfs)
         self.load_button = tk.Button(self.graph_frame, text="📂 Load Graph", font=("Arial", 12), bg="#9C27B0", 
                                      fg="#FFFFFF", relief=tk.RAISED, borderwidth=2, width=15, command=self.load_graph)
@@ -82,10 +82,10 @@ class App(tk.Tk):
     
     def create_legend(self):
         colors = [
-            ("lightgreen", "Unvisited vertices"),
-            ("lightblue", "Visited vertices"),
-            ("orange", "Current vertex"),
-            ("red", "Target vertex")
+            ("#4CAF50", "Unvisited vertices"),
+            ("#2196F3", "Visited vertices"),
+            ("#FF9800", "Current vertex"),
+            ("#F00000", "Found vertex")
         ]
         
         for color, text in colors:
