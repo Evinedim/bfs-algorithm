@@ -43,24 +43,24 @@ class App(tk.Tk):
                                  width=5, justify="center", relief=tk.SUNKEN, borderwidth=2)
         
         self.initialize_button = tk.Button(self.left_frame, text="Initialize BFS", font=("Arial", 12, "bold"), bg="#4CAF50", 
-                                           fg="white", relief=tk.RAISED, borderwidth=2, padx=20, pady=8, command=self.initialize_bfs)
+                                           fg="#FFFFFF", relief=tk.RAISED, borderwidth=2, padx=20, pady=8, command=self.initialize_bfs)
         
         self.nav_frame = tk.LabelFrame(self.left_frame, text="Step Navigation", font=("Arial", 12), padx=10, pady=10)
         self.prev_button = tk.Button(self.nav_frame, text="◀ Previous Step", font=("Arial", 12, "bold"), bg="#2196F3", 
-                                     fg="white", relief=tk.RAISED, borderwidth=2, width=15, command=self.previous_step)
+                                     fg="#FFFFFF", relief=tk.RAISED, borderwidth=2, width=15, command=self.previous_step)
         self.next_button = tk.Button(self.nav_frame, text="Next Step ▶", font=("Arial", 12, "bold"), bg="#2196F3", 
-                                     fg="white", relief=tk.RAISED, borderwidth=2, width=15, command=self.next_step)
+                                     fg="#FFFFFF", relief=tk.RAISED, borderwidth=2, width=15, command=self.next_step)
         
         self.step_info_frame = tk.Frame(self.nav_frame)
         self.step_label = tk.Label(self.step_info_frame, text="Step: 0/0", font=("Arial", 12, "bold"))
         
         self.graph_frame = tk.LabelFrame(self.left_frame, text="Graph Operations", font=("Arial", 12), padx=10, pady=10)
-        self.reset_button = tk.Button(self.graph_frame, text="🔄 Reset Graph", font=("Arial", 12), bg="#FF9800", 
-                                      fg="white", relief=tk.RAISED, borderwidth=2, width=15, command=self.draw_graph)
+        self.reset_button = tk.Button(self.graph_frame, text="🔄 Reset BFS", font=("Arial", 12), bg="#FF9800", 
+                                      fg="#FFFFFF", relief=tk.RAISED, borderwidth=2, width=15, command=self.reset_bfs)
         self.load_button = tk.Button(self.graph_frame, text="📂 Load Graph", font=("Arial", 12), bg="#9C27B0", 
-                                     fg="white", relief=tk.RAISED, borderwidth=2, width=15, command=self.load_graph)
+                                     fg="#FFFFFF", relief=tk.RAISED, borderwidth=2, width=15, command=self.load_graph)
         
-        self.canvas = tk.Canvas(self, bg="white", relief=tk.SUNKEN, borderwidth=2)
+        self.canvas = tk.Canvas(self, bg="#FFFFFF", relief=tk.SUNKEN, borderwidth=2)
 
         self.right_frame = tk.Frame(self)
         
@@ -72,7 +72,7 @@ class App(tk.Tk):
         self.details_frame = tk.LabelFrame(self.right_frame, text="Current Step", font=("Arial", 12), padx=10, pady=10)
         self.path_label = tk.Label(self.details_frame, text="Current path: \n-", font=("Arial", 12), justify=tk.LEFT, wraplength=250)
         self.visited_label = tk.Label(self.details_frame, text="Visited vertices: \n-", font=("Arial", 12), justify=tk.LEFT, wraplength=250)
-        self.queue_label = tk.Label(self.details_frame, text="Queue status: \n-", font=("Arial", 12), justify=tk.LEFT, wraplength=250)
+        self.queue_label = tk.Label(self.details_frame, text="Paths in queue: \n-", font=("Arial", 12), justify=tk.LEFT, wraplength=250)
         
     def setup_layout(self):
         self.grid_columnconfigure(0, weight=0)
@@ -141,11 +141,11 @@ class App(tk.Tk):
             x2 -= 20 * math.cos(angle)
             y2 -= 20 * math.sin(angle)
 
-            self.canvas.create_line(x1, y1, x2, y2, width=3, fill="black", arrow=tk.LAST, arrowshape=(16, 20, 6))          
+            self.canvas.create_line(x1, y1, x2, y2, width=3, fill="#000000", arrow=tk.LAST, arrowshape=(16, 20, 6))          
 
         for vertex, (x, y) in self.coords.items():
-            self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, fill="lightgreen", outline="black", width=3)
-            self.canvas.create_text(x, y, text=str(vertex), font=("Arial", 12))
+            self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, fill="#4CAF50", outline="#000000", width=3)
+            self.canvas.create_text(x, y, text=str(vertex), fill="#FFFFFF", font=("Arial", 12, "bold"))
 
     def load_graph(self):
         file_path = filedialog.askopenfilename()
@@ -200,20 +200,33 @@ class App(tk.Tk):
         self.visited_label.config(text=f"Visited vertices: \n{', '.join(sorted(visited)) if visited else "-"}")
         
         queue_display = [' → '.join(path) for path in step['queue']]
-        self.queue_label.config(text=f"Queue content: \n{'\n'.join(queue_display) if queue_display else "-"}")
+        self.queue_label.config(text=f"Paths in queue: \n{'\n'.join(queue_display) if queue_display else "-"}")
         
         for vertex, (x, y) in self.coords.items():
             if current_node == vertex == self.end_entry.get().strip():
-                fill_color = "red"
+                fill_color = "#F00000"
             elif vertex == current_node:
-                fill_color = "orange"
+                fill_color = "#FF9800"
             elif vertex in visited:
-                fill_color = "lightblue"
+                fill_color = "#2196F3"
             else:
-                fill_color = "lightgreen"
+                fill_color = "#4CAF50"
             
-            self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, fill=fill_color, outline="black", width=2)
-            self.canvas.create_text(x, y, text=str(vertex), font=("Arial", 12, "bold"))
+            self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, fill=fill_color, outline="#000000", width=2)
+            self.canvas.create_text(x, y, text=str(vertex), fill="#FFFFFF", font=("Arial", 12, "bold"))
+ 
+        for i in range(len(current_path) - 1):
+            v1, v2 = current_path[i], current_path[i + 1]
+            x1, y1, x2, y2 = *self.coords[v1], *self.coords[v2]
+            
+            angle = math.atan2(y2 - y1, x2 - x1)
+
+            x1 += 20 * math.cos(angle)
+            y1 += 20 * math.sin(angle)
+            x2 -= 20 * math.cos(angle)
+            y2 -= 20 * math.sin(angle)
+
+            self.canvas.create_line(x1, y1, x2, y2, width=4, fill="red", arrow=tk.LAST, arrowshape=(16, 20, 6))
 
     def next_step(self):
         if self.current_step < len(self.bfs_steps) - 1:
@@ -224,6 +237,17 @@ class App(tk.Tk):
         if self.current_step > 0:
             self.current_step -= 1
             self.draw_current()
+
+    def reset_bfs(self):
+        self.canvas.delete("all")
+        self.bfs_steps = []
+        self.current_step = 0
+        self.step_label.config(text=f"Step: 0/0")
+        self.path_label.config(text=f"Current path: \n-")
+        self.visited_label.config(text=f"Visited vertices: \n-")
+        self.queue_label.config(text=f"Paths in queue: \n-")
+        self.draw_graph()
+
 
 if __name__ == "__main__":
     app = App()
