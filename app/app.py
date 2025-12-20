@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 import math
 import json
+import time
 from bfs import bfs
 
 
@@ -46,6 +47,8 @@ class App(tk.Tk):
                                            fg="#FFFFFF", relief=tk.RAISED, borderwidth=2, padx=20, pady=8, command=self.initialize_bfs)
         
         self.nav_frame = tk.LabelFrame(self.left_frame, text="Step Navigation", font=("Arial", 12), padx=10, pady=10)
+        self.auto_button = tk.Button(self.nav_frame, text="Auto BFS", font=("Arial", 12, "bold"), bg="#2196F3", 
+                                     fg="#FFFFFF", relief=tk.RAISED, borderwidth=2, width=15, command=self.auto_bfs)
         self.prev_button = tk.Button(self.nav_frame, text="◀ Previous Step", font=("Arial", 12, "bold"), bg="#2196F3", 
                                      fg="#FFFFFF", relief=tk.RAISED, borderwidth=2, width=15, command=self.previous_step)
         self.next_button = tk.Button(self.nav_frame, text="Next Step ▶", font=("Arial", 12, "bold"), bg="#2196F3", 
@@ -67,7 +70,7 @@ class App(tk.Tk):
         self.right_title_label = tk.Label(self.right_frame, text="BFS details", font=("Arial", 16, "bold"), pady=10)
 
         self.status_frame = tk.LabelFrame(self.right_frame, text="Algorithm Status", font=("Arial", 12), padx=10, pady=10)
-        self.status_label = tk.Label(self.status_frame, text="Status: Ready", font=("Arial", 12), justify=tk.LEFT, wraplength=250)
+        self.status_label = tk.Label(self.status_frame, text="Ready", font=("Arial", 12), justify=tk.LEFT, wraplength=250)
         
         self.details_frame = tk.LabelFrame(self.right_frame, text="Current Step", font=("Arial", 12), padx=10, pady=10)
         self.path_label = tk.Label(self.details_frame, text="Current path: \n-", font=("Arial", 12), justify=tk.LEFT, wraplength=250)
@@ -94,6 +97,7 @@ class App(tk.Tk):
         self.initialize_button.pack(pady=15, padx=10)
         
         self.nav_frame.pack(fill=tk.X, padx=10, pady=5)
+        self.auto_button.pack(pady=5)
         self.prev_button.pack(pady=5)
         self.next_button.pack(pady=5)
         self.step_info_frame.pack(pady=10)
@@ -238,10 +242,19 @@ class App(tk.Tk):
             self.current_step -= 1
             self.draw_current()
 
+    def auto_bfs(self):
+        self.current_step = 0
+        while self.current_step <= len(self.bfs_steps):
+            time.sleep(1)
+            self.draw_current()
+            self.update()
+            self.current_step += 1
+
     def reset_bfs(self):
         self.canvas.delete("all")
         self.bfs_steps = []
         self.current_step = 0
+        self.status_label.config(text=f"Ready")
         self.step_label.config(text=f"Step: 0/0")
         self.path_label.config(text=f"Current path: \n-")
         self.visited_label.config(text=f"Visited vertices: \n-")
