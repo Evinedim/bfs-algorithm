@@ -27,6 +27,7 @@ class App(tk.Tk):
         self.current_step = 0
 
         self.create_widgets()
+        self.create_legend()
         self.setup_layout()
         self.draw_graph()
 
@@ -76,7 +77,27 @@ class App(tk.Tk):
         self.path_label = tk.Label(self.details_frame, text="Current path: \n-", font=("Arial", 12), justify=tk.LEFT, wraplength=250)
         self.visited_label = tk.Label(self.details_frame, text="Visited vertices: \n-", font=("Arial", 12), justify=tk.LEFT, wraplength=250)
         self.queue_label = tk.Label(self.details_frame, text="Paths in queue: \n-", font=("Arial", 12), justify=tk.LEFT, wraplength=250)
+
+        self.legend_frame = tk.LabelFrame(self.right_frame, text="Color Legend", font=("Arial", 12), padx=10, pady=10)
+    
+    def create_legend(self):
+        colors = [
+            ("lightgreen", "Unvisited vertices"),
+            ("lightblue", "Visited vertices"),
+            ("orange", "Current vertex"),
+            ("red", "Target vertex")
+        ]
         
+        for color, text in colors:
+            frame = tk.Frame(self.legend_frame)
+            frame.pack(fill=tk.X, pady=2)
+            
+            color_canvas = tk.Canvas(frame, width=20, height=20, bg=color, highlightthickness=1, highlightbackground="black")
+            color_canvas.pack(side=tk.LEFT, padx=(0, 10))
+            
+            label = tk.Label(frame, text=text, font=("Arial", 12))
+            label.pack(side=tk.LEFT)
+
     def setup_layout(self):
         self.grid_columnconfigure(0, weight=0)
         self.grid_columnconfigure(1, weight=1)
@@ -121,6 +142,8 @@ class App(tk.Tk):
         self.path_label.pack(anchor=tk.W, pady=2)
         self.visited_label.pack(anchor=tk.W, pady=2)
         self.queue_label.pack(anchor=tk.W, pady=2)
+
+        self.legend_frame.pack(fill=tk.X, padx=10, pady=5)
 
     def draw_graph(self):
         vertexes = set(self.graph.keys())
@@ -185,7 +208,7 @@ class App(tk.Tk):
                 )
             self.draw_current()
         except:
-            messagebox.showerror("Error", "There are no such vertexes!!!")
+            messagebox.showerror("Error", "There are no such vertices!!!")
 
     def draw_current(self):
         if not self.bfs_steps or self.current_step >= len(self.bfs_steps):
